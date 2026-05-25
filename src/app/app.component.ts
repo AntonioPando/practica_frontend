@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import {RouterOutlet} from "@angular/router";
+import {Router, RouterOutlet} from "@angular/router";
+import { LoginService } from './core/services/login.service';
 
 @Component({
   selector: "app-root",
@@ -8,9 +9,18 @@ import {RouterOutlet} from "@angular/router";
   imports: [
     RouterOutlet,
   ],
+  providers: [
+    LoginService
+  ],
   standalone: true,
 
 })
 export class AppComponent {
+
+  loginService: LoginService;
+
+  constructor(private router: Router, loginService: LoginService) {
+    this.loginService = loginService; 
+  }
 
 }

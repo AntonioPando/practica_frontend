@@ -20,6 +20,9 @@ export class UserPopupComponent implements OnInit {
     }
 
     async onSave() {
+        console.log("Boton de guardar pulsado");
+        console.log("User: ", localStorage.getItem("nickUsuario"));
+        console.log("Password: ", localStorage.getItem("password"));
         this.cerrarPopUpOk.emit();
     }
     onCancel() {
