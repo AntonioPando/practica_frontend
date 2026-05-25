@@ -5,6 +5,12 @@
         <h2>Pop Up</h2>
     </div>
 
+    <div *ngIf="estadoPopup === 'CREAR'">
+        <p>Contenido del Pop Up para CREAR usuario</p>
+    </div>
+    <div *ngIf="estadoPopup === 'ACTUALIZAR'">
+        <p>Contenido del Pop Up para ACTUALIZAR usuario</p>
+    </div>
     <button (click)="onSave()">Aceptar</button>
     <button (click)="onCancel()">Cancelar</button>
     <!-- @TODO: Implementar el contenido del pop up, así como los botones de acción (ej. Cancelar, Aceptar) -->

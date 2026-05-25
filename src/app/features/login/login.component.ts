@@ -8,9 +8,7 @@ import { LoginService } from "src/app/core/services/login.service";
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.css"],
   standalone: true,
-  imports: [
-    FormsModule
-  ],
+  imports: [FormsModule],
 })
 export class LoginComponent {
   loginService: LoginService;
@@ -26,13 +24,16 @@ export class LoginComponent {
 
   async login() {
     console.log("Boton de login pulsado");
-    let result = await this.loginService.iniciarSesion(this.nickUsuario, this.password);
+    let result = await this.loginService.iniciarSesion(
+      this.nickUsuario,
+      this.password,
+    );
     console.log("Resultado del login:", result);
     if (result === true) {
       console.log("Login exitoso, redirigiendo a /usuarios");
       localStorage.setItem("nickUsuario", this.nickUsuario);
       localStorage.setItem("password", this.password);
-      this.router.navigate(['/usuarios']);
+      this.router.navigate(["/usuarios"]);
     } else {
       console.log("Login fallido: credenciales incorrectas");
       alert("Login fallido: credenciales incorrectas");

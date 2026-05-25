@@ -1,5 +1,6 @@
 .user-list-container {
-  max-width: 600px;
+  max-width: 1400px;
+  width: 95%;
   margin: 30px auto;
 }
 .dialog-overlay {
@@ -37,6 +38,8 @@ body {
 
 table {
   width: 100%;
+  table-layout: auto;
+  min-width: 900px;
 }
 
 table, th, tr, td {
@@ -62,7 +65,7 @@ tr:nth-child(even) {background-color: #f7cecc;}
 
 .container-button {
   display: flex; /* alinear horizontalmente */
-  gap: 10px;
+  gap: 15px;
   margin-bottom: .8rem;
 }
 
@@ -143,4 +146,25 @@ input,textarea, select {
 
 .img-gender {
   max-height: 25px;
+}
+
+.table-container-overflow {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* permitir que el contenido de las celdas se ajuste en varias líneas si es necesario */
+td, th {
+  white-space: normal;
+}
+
+/* ellipsis span for long addresses */
+.ellipsis {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
 }

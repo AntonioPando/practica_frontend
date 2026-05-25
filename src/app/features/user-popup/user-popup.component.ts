@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output} from "@angular/core";
+import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 @Component({
@@ -12,8 +12,11 @@ export class UserPopupComponent implements OnInit {
 
     @Output() cerrarPopUpOk = new EventEmitter<void>();
     @Output() cerrarPopUpCancel = new EventEmitter<void>();
-    constructor() {
 
+    @Input() estadoPopup: string = "CREAR";
+
+    constructor() {
+        
     }
 
     async ngOnInit() {
