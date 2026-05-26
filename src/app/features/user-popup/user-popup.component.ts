@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, Input } from "@angular/core";
+import { Component, EventEmitter, OnInit, Output, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { UserService } from "src/app/core/services/user.service";
@@ -63,19 +63,54 @@ export class UserPopupComponent implements OnInit {
             this.puestos = [];
             console.error('Error loading puestos', e);
         }
+    }
 
-        // Cargar direcciones para el usuario seleccionado (en modo actualización)
+    // Detectar cambios en los @Input para cargar el usuario cuando se abre el popup en modo ACTUALIZAR
+    async ngOnChanges(changes: SimpleChanges) {
+        if (changes['estadoPopup'] || changes['selectedUserId']) {
+            if (this.estadoPopup === 'ACTUALIZAR' && this.selectedUserId != null) {
+                await this.loadUserForUpdate(this.selectedUserId);
+            }
+        }
+    }
+
+    private async loadUserForUpdate(id: number) {
         try {
-            const dirs: any = await this.userService.obtenerTodasDirecciones();
-            this.direcciones = (Array.isArray(dirs) ? dirs : []).map((d: any) => this.normalizeDireccionFromApi(d));
-            if (this.selectedUserId != null) {
-                const idx = this.direcciones.findIndex(d => d.usuarioId === this.selectedUserId && !!d.direccion_principal);
-                if (idx >= 0) this.mainAddressIndex = idx;
+            const user: any = await this.userService.obtenerUsuario(id);
+            if (user) {
+                this.nickUsuario = user.nickUsuario ?? '';
+                this.password = user.contrasena ?? user.password ?? '';
+                this.nombre = user.nombre ?? '';
+                this.primerApellido = user.primerApellido ?? '';
+                this.segundoApellido = user.segundoApellido ?? '';
+                this.fechaNacimiento = user.fechaNacimiento ? (user.fechaNacimiento.split('T')[0]) : '';
+                this.fechaHoraCreacion = user.fechaHoraCreacion ?? this.fechaHoraCreacion;
+                this.horaDesayuno = user.horaDesayuno ? this.formatTimeForInput(user.horaDesayuno) : '';
+                this.generoId = user.genero ? user.genero.id : (user.generoId ?? null);
+                this.puestoDeTrabajoId = user.puestoDeTrabajo ? user.puestoDeTrabajo.id : (user.puestoDeTrabajoId ?? null);
             }
         } catch (e) {
-            this.direcciones = [];
-            console.error('Error loading direcciones', e);
+            console.error('Error loading usuario for update', e);
         }
+
+        // cargar direcciones del usuario
+        try {
+            const dirsResp: any = await this.userService.obtenerDireccionesPorUsuario(id);
+            this.direcciones = Array.isArray(dirsResp) ? dirsResp.map((d: any) => this.normalizeDireccionFromApi(d)) : [];
+            const idx = this.direcciones.findIndex(d => !!d.direccion_principal);
+            this.mainAddressIndex = idx >= 0 ? idx : null;
+        } catch (e) {
+            console.error('Error loading direcciones for user', e);
+            this.direcciones = [];
+        }
+    }
+
+    private formatTimeForInput(t: string) {
+        // backend may return hh:mm:ss, we need hh:mm
+        if (!t) return '';
+        const parts = t.split(':');
+        if (parts.length >= 2) return parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+        return t;
     }
 
     // ---- Eventos y acciones ----------------------------------------
@@ -83,7 +118,6 @@ export class UserPopupComponent implements OnInit {
         console.log('Save user');
         const usuarioPost: any = {
             nickUsuario: this.nickUsuario,
-            password: this.password,
             nombre: this.nombre,
             primerApellido: this.primerApellido,
             segundoApellido: this.segundoApellido,
@@ -95,17 +129,96 @@ export class UserPopupComponent implements OnInit {
             puestoDeTrabajoId: this.puestoDeTrabajoId
         };
 
-        const createdResp: any = await this.userService.crearUsuario(usuarioPost);
-        if (Array.isArray(createdResp)) {
-            const err = createdResp[0];
-            alert('Error creando usuario: ' + this.formatError(err));
+        // Solo añadimos la contraseña al payload si el usuario ha escrito una nueva
+        if (this.password && this.password.trim() !== '') {
+            usuarioPost.password = this.password;
+            usuarioPost.contrasena = this.password;
+        }
+
+        if (this.estadoPopup === 'CREAR') {
+            const createdResp: any = await this.userService.crearUsuario(usuarioPost);
+            if (Array.isArray(createdResp)) {
+                const err = createdResp[0];
+                alert('Error creando usuario: ' + this.formatError(err));
+                return;
+            }
+            const created = createdResp;
+            const userId = created?.id || created?.body?.id || null;
+            // assign any addresses created without usuarioId
+            for (let i = 0; i < this.direcciones.length; i++) {
+                const a = this.direcciones[i];
+                if (!a) continue;
+                try {
+                    if (a.id) {
+                        // Si la dirección ya tiene un ID, se creó pero sin usuarioId, así que la actualizamos con el usuarioId correcto
+                        const payload = this.buildDireccionPayload({ ...a, usuarioId: userId });
+                        await this.userService.actualizarDireccion(a.id, payload);
+                    } else {
+                        // Si la dirección no tiene ID, se creó sin usuarioId, así que la creamos de nuevo con el usuarioId correcto
+                        const payload = this.buildDireccionPayload({ ...a, usuarioId: userId });
+                        await this.userService.crearDireccion(payload);
+                    }
+                } catch (e) {
+                    console.error('Error assigning address after create', e);
+                }
+            }
+            this.cerrarPopUpOk.emit();
             return;
         }
 
-        const created = createdResp;
-        const userId = created?.id || created?.body?.id || null;
+        // ACTUALIZAR
+        if (this.estadoPopup === 'ACTUALIZAR' && this.selectedUserId != null) {
+            try {
+                const resp: any = await this.userService.actualizarUsuario(this.selectedUserId, usuarioPost);
+                if (Array.isArray(resp)) {
+                    alert('Error actualizando usuario: ' + this.formatError(resp[0]));
+                    return;
+                }
+            } catch (e) {
+                alert('Error actualizando usuario: ' + this.formatError(e));
+                return;
+            }
 
-        this.cerrarPopUpOk.emit();
+            // Persistir direcciones: crear o actualizar según corresponda.
+            // Asegurar que solo una tenga direccion_principal = true
+            let mainFound = false;
+            for (let i = 0; i < this.direcciones.length; i++) {
+                const a = this.direcciones[i];
+                if (!a) continue;
+                if (a.direccion_principal && !mainFound) mainFound = true;
+                if (!a.direccion_principal && !mainFound && i === this.mainAddressIndex) {
+                    a.direccion_principal = true;
+                    mainFound = true;
+                }
+            }
+
+            for (let i = 0; i < this.direcciones.length; i++) {
+                const a = this.direcciones[i];
+                if (!a) continue;
+                const payload = this.buildDireccionPayload({ ...a, usuarioId: this.selectedUserId });
+                try {
+                    if (a.id) {
+                        await this.userService.actualizarDireccion(a.id, payload);
+                    } else {
+                        const createdAddr: any = await this.userService.crearDireccion(payload);
+                        // update local entry with returned id if available
+                        const norm = this.normalizeDireccionFromApi(createdAddr);
+                        this.direcciones[i] = { ...a, ...norm };
+                    }
+                } catch (e) {
+                    console.error('Error persisting address on update', e);
+                }
+            }
+
+            // If main address changed, ensure backend reflects that: toggleMainAddress already persists for addresses with id,
+            // but to be safe, set direccion_principal flags and persist them if necessary.
+            if (this.mainAddressIndex != null) {
+                await this.toggleMainAddress(this.mainAddressIndex);
+            }
+
+            this.cerrarPopUpOk.emit();
+            return;
+        }
     }
 
     // Cerrar sin guardar

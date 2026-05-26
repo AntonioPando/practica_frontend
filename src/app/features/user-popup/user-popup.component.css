@@ -88,8 +88,9 @@ td input[type="radio"] {
     background-color: #fefefe;
     cursor: pointer;
     border-radius: .2rem;
-    color: #fff;
+    color: black;
     margin: 10px;
+    border: 1px solid #ccc;
 }
 
 .main-button, .main-button-icon {

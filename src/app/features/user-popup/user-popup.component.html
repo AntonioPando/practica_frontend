@@ -3,10 +3,10 @@
 <div class="dialog-box">
     <div class="dialog-title">
         <h2 *ngIf="estadoPopup === 'CREAR'">Crear Usuario</h2>
-        <h2 *ngIf="estadoPopup === 'ACTUALIZAR'">Edit User</h2>
+        <h2 *ngIf="estadoPopup === 'ACTUALIZAR'">Update User</h2>
     </div>
 
-    <div *ngIf="estadoPopup === 'CREAR'">
+    <div>
         <div class="form-row">
             <div class="form-column">
                 <label>Nickname</label>
@@ -82,9 +82,9 @@
             </div>
         </div>
         <div class="container-button">
-            <button class="main-button" (click)="addAddress()">Create</button>
-            <button class="main-button" (click)="updateAddress()">Update</button>
-            <button class="main-button" (click)="deleteAddress()">Delete</button>
+            <button class="main-button" (click)="addAddress()">Crear</button>
+            <button class="main-button" (click)="updateAddress()">Actualizar</button>
+            <button class="main-button" (click)="deleteAddress()">Eliminar</button>
         </div>
 
         <div style="max-height:200px; overflow-y:auto;">
@@ -113,8 +113,8 @@
         </div>
 
         <div style="margin-top:1rem; text-align:right;">
-            <button class="main-button" (click)="onSave()">Save</button>
-            <button class="default-btn" (click)="onCancel()">Cancel</button>
+            <button class="main-button" (click)="onSave()">Guardar</button>
+            <button class="default-btn" (click)="onCancel()">Cancelar</button>
         </div>
     </div>
 

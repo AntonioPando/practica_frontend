@@ -34,6 +34,22 @@ export class UserService {
     return await to(this.http.post<any>(url, usuarioPost).toPromise());
   }
 
+  async obtenerUsuario(id: number) {
+    const url = `${ConstUrls.API_URL}/api/v1/usuarios/${id}`;
+    try {
+      const data = await this.http.get<any>(url).toPromise();
+      return data;
+    } catch (err) {
+      console.error('Error obtenerUsuario', err);
+      return null;
+    }
+  }
+
+  async actualizarUsuario(id: number, usuarioPost: any) {
+    const url = `${ConstUrls.API_URL}/api/v1/usuarios/${id}`;
+    return await to(this.http.put<any>(url, usuarioPost).toPromise());
+  }
+
   async crearDireccion(direccion: any) {
     const url = `${ConstUrls.API_URL}/api/v1/direcciones`;
     return await to(this.http.post<any>(url, direccion).toPromise());
