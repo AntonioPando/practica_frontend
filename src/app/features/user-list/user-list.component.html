@@ -1,5 +1,7 @@
 <app-user-popup
-  *ngIf="modoPopup !== 'CLOSED'" [estadoPopup]="estadoPopup"
+  *ngIf="modoPopup !== 'CLOSED'"
+  [estadoPopup]="estadoPopup"
+  [selectedUserId]="selectedUserId"
   (cerrarPopUpOk)="onCerrarPopUpOk()"
   (cerrarPopUpCancel)="onCerrarPopUpCancel()"
 />
@@ -17,58 +19,88 @@
         <p>Creado el: {{ usuario.fechaHoraCreacion | date:'short' }}</p>
     </div> -->
 
-    <div class="container-button">
-        <button class="button main-button" (click)="launchPopupCreate()">Crear</button>
-        <button class="button main-button" (click)="launchPopupUpdate()">Update</button>
-        <button class="button main-button-icon" (click)="launchPopup()"><img src="assets/images/DeleteIcon.JPG" alt="Delete" class="img-icon"></button>
+  <div class="container-button">
+    <button class="button main-button" (click)="launchPopupCreate()">
+      Crear
+    </button>
+    <button class="button main-button" (click)="launchPopupUpdate()">
+      Actualizar
+    </button>
+      <button class="button main-button-icon" (click)="openConfirmDelete()">
+        <img src="assets/images/DeleteIcon.JPG" alt="Delete" class="img-icon" />
+      </button>
     </div>
 
+    <!-- Confirm Delete Modal -->
+    <div *ngIf="confirmDeleteVisible" class="modal-overlay">
+      <div class="modal">
+        <h3>¿Estás seguro de que deseas eliminar el usuario seleccionado?</h3>
+        <div class="modal-actions">
+          <button class="default-btn" (click)="cancelDelete()">Cancelar</button>
+          <button class="main-button" (click)="confirmDelete()">Sí</button>
+        </div>
+    
+    </div>
+  </div>
 
-    <div class="table-container-overflow">
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Gender</th>
-              <th>Username</th>
-              <th>Full Name</th>
-              <th>Fecha de Creación</th>
-              <th>Age</th>
-              <th>Breakfast</th>
-              <th>Job Position</th>
-              <th>Main Address</th>
-              <th>Extra Addresses</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let usuario of usuarios" class = "table-column">
-              <td><input type="radio" name="selectedUser" [value]="usuario.id.toString()" [(ngModel)]="selectedUserId"/></td>
-              <!-- <td *ngIf="usuario.genero.id === 2"><img src ="assets/images/Female.JPG" alt="{{ usuario.genero.nombre }}" width="25px" height="25px"></td>
+  <div class="table-container-overflow">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Genero</th>
+          <th>Nickname</th>
+          <th>Nombre Completo</th>
+          <th>Fecha de Creación</th>
+          <th>Edad</th>
+          <th>Desayuno</th>
+          <th>Puesto de Trabajo</th>
+          <th>Direccion Principal</th>
+          <th>Direcciones Extra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios" class="table-column">
+          <td>
+            <input
+              type="radio"
+              name="selectedUser"
+              [value]="usuario.id"
+              [(ngModel)]="selectedUserId"
+            />
+          </td>
+          <!-- <td *ngIf="usuario.genero.id === 2"><img src ="assets/images/Female.JPG" alt="{{ usuario.genero.nombre }}" width="25px" height="25px"></td>
                         <td *ngIf="usuario.genero.id === 1"><img src ="assets/images/Male.JPG" alt="{{ usuario.genero.nombre }}" width="25px" height="25px"></td> -->
-              <td>
-                <img
-                  [src]="resolveGenero(usuario)"
-                  alt="{{ usuario.genero.nombre }}"
-                  class="img-gender"
-                />
-              </td>
-              <td>{{ usuario.nickUsuario }}</td>
-              <td>{{ nombreCompleto(usuario) }}</td>
-              <td>{{ usuario.fechaHoraCreacion | date:'yyyy-MM-dd HH:mm' }}</td>
-              <td>{{ calcularEdad(usuario.fechaNacimiento) }}</td>
-              <td>{{ usuario.horaDesayuno ? (usuario.horaDesayuno | slice:0:5) : '' }}</td>
-              <td>{{ getPuestoTrabajoNombre(usuario) }}</td>
-              <td>
-                <span class="ellipsis" [title]="obtenerDireccionPrincipalTexto(usuario)">
-                  {{ obtenerDireccionPrincipalTexto(usuario) }}
-                </span>
-              </td>
-              <td>{{ contarDireccionesExtras(usuario) }}</td>
-            </tr>
-          </tbody>
-        </table>
-    </div>
+          <td>
+            <img
+              [src]="resolveGenero(usuario)"
+              alt="{{ usuario.genero.nombre }}"
+              class="img-gender"
+            />
+          </td>
+          <td>{{ usuario.nickUsuario }}</td>
+          <td>{{ nombreCompleto(usuario) }}</td>
+          <td>{{ usuario.fechaHoraCreacion | date: "yyyy-MM-dd HH:mm" }}</td>
+          <td>{{ calcularEdad(usuario.fechaNacimiento) }}</td>
+          <td>
+            {{
+              usuario.horaDesayuno ? (usuario.horaDesayuno | slice: 0 : 5) : ""
+            }}
+          </td>
+          <td>{{ getPuestoTrabajoNombre(usuario) }}</td>
+          <td>
+            <span
+              class="ellipsis"
+              [title]="obtenerDireccionPrincipalTexto(usuario)"
+            >
+              {{ obtenerDireccionPrincipalTexto(usuario) }}
+            </span>
+          </td>
+          <td>{{ contarDireccionesExtras(usuario) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    {{ selectedUserId }}
-
+  {{ selectedUserId }}
 </div>

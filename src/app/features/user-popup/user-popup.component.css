@@ -56,10 +56,40 @@ td {
 
 tr:nth-child(even) {background-color: #f7cecc;}
 
+tr.selected {
+    background-color: #f6bfc0 !important;
+}
+
+table thead th {
+    background-color: #d81614;
+    color: #fff;
+}
+
+td input[type="radio"] {
+    transform: scale(1.1);
+}
+
+.street {
+    text-align: left;
+    padding-left: 0.5rem;
+}
+
 .container-button {
     display: flex; /* alinear horizontalmente */
     gap: 10px;
     margin-bottom: .8rem;
+}
+
+.default-btn{
+    width: auto;
+    height: 40px;
+    padding: .4rem .6rem;
+    border: none;
+    background-color: #fefefe;
+    cursor: pointer;
+    border-radius: .2rem;
+    color: #fff;
+    margin: 10px;
 }
 
 .main-button, .main-button-icon {
@@ -71,12 +101,6 @@ tr:nth-child(even) {background-color: #f7cecc;}
     cursor: pointer;
     border-radius: .2rem;
     color: #fff;
-}
-
-.default-btn {
-    background-color: #fefefe;
-    color: #000;
-    border: 1px solid #e5e5e5;
 }
 
 .img-icon {

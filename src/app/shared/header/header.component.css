@@ -1,0 +1,29 @@
+.app-header {
+  width: 100%;
+  background: #222;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+}
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.actions {
+}
+.logout-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.logout-btn:hover { opacity: 0.95 }
